@@ -1,0 +1,10 @@
+# Normalise line endings so the repo behaves the same on Windows and Linux.
+# Without this, CRLF checked out on Windows breaks shell scripts and seed
+# scripts inside the Linux Docker image.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.pdf binary
+*.xlsx binary
+package-lock.json -diff

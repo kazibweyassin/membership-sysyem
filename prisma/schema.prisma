@@ -1,0 +1,321 @@
+// Prisma schema for the Membership Management System
+// See spec.md section 13 for the full database design.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMINISTRATOR
+  MEMBERSHIP_OFFICER
+  FINANCE_OFFICER
+}
+
+enum MemberStatus {
+  PAID
+  UNPAID
+  ONBOARDING
+  CANCELLED
+}
+
+enum ExpiryStatus {
+  ACTIVE
+  EXPIRING_SOON
+  EXPIRED
+  RENEWAL_DUE
+}
+
+enum OnboardingStageStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum InvoiceStatus {
+  DRAFT
+  ISSUED
+  PARTIALLY_PAID
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PAID
+  UNPAID
+  PARTIALLY_PAID
+  OVERDUE
+}
+
+enum ReminderType {
+  PAYMENT_DUE
+  PAYMENT_OVERDUE
+  MEMBERSHIP_EXPIRY
+  RENEWAL
+  MANUAL
+}
+
+enum DeliveryStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+enum NotificationType {
+  INVOICE_DUE
+  PAYMENT_OVERDUE
+  MEMBERSHIP_EXPIRY
+  MEMBERSHIP_EXPIRED
+  ONBOARDING_INCOMPLETE
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  role         Role     @default(MEMBERSHIP_OFFICER)
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  auditLogs          AuditLog[]
+  onboardingTasks    OnboardingTask[]
+  reminders          ReminderHistory[]
+  notifications      Notification[]
+  documentsUploaded  Document[]
+  paymentsRecorded   Payment[]
+}
+
+model MembershipCategory {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  fee         Decimal  @db.Decimal(12, 2)
+  description String?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members  Member[]
+  invoices Invoice[]
+}
+
+model Member {
+  id              String       @id @default(cuid())
+  internalId      String       @unique // Auto-generated internal ID
+  memberNumber    String       @unique // Membership number
+  companyName     String
+  categoryId      String
+  registrationDate DateTime    @default(now())
+  startDate       DateTime
+  status          MemberStatus @default(ONBOARDING)
+  expiryStatus    ExpiryStatus @default(ACTIVE)
+  address         String?
+  website         String?
+  notes           String?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  category         MembershipCategory  @relation(fields: [categoryId], references: [id])
+  contacts         MemberContact[]
+  onboardingTasks  OnboardingTask[]
+  membershipPeriods MembershipPeriod[]
+  invoices         Invoice[]
+  reminders        ReminderHistory[]
+  documents        Document[]
+  notifications    Notification[]
+  auditLogs        AuditLog[]
+
+  @@index([companyName])
+  @@index([memberNumber])
+  @@index([status])
+  @@index([categoryId])
+}
+
+model MemberContact {
+  id        String   @id @default(cuid())
+  memberId  String
+  fullName  String
+  jobTitle  String?
+  phone     String
+  email     String
+  isPrimary Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@index([memberId])
+}
+
+model MembershipPeriod {
+  id            String    @id @default(cuid())
+  memberId      String
+  startDate     DateTime
+  expiryDate    DateTime
+  paymentDate   DateTime?
+  renewalDate   DateTime?
+  amount        Decimal   @db.Decimal(12, 2)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@index([memberId])
+  @@index([expiryDate])
+}
+
+model OnboardingTask {
+  id            String                @id @default(cuid())
+  memberId      String
+  stage         Int                   // 1-6
+  name          String
+  status        OnboardingStageStatus @default(PENDING)
+  completedDate DateTime?
+  responsibleId String?
+  notes         String?
+  documentId    String?
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+
+  member       Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  responsible  User?    @relation(fields: [responsibleId], references: [id])
+  document     Document? @relation(fields: [documentId], references: [id])
+
+  @@unique([memberId, stage])
+  @@index([memberId])
+}
+
+model Invoice {
+  id            String        @id @default(cuid())
+  invoiceNumber String        @unique
+  memberId      String
+  categoryId    String
+  invoiceDate   DateTime      @default(now())
+  dueDate       DateTime
+  amount        Decimal       @db.Decimal(12, 2)
+  amountPaid    Decimal       @db.Decimal(12, 2) @default(0)
+  currency      String        @default("USD")
+  status        InvoiceStatus @default(DRAFT)
+  notes         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  member      Member        @relation(fields: [memberId], references: [id])
+  category    MembershipCategory @relation(fields: [categoryId], references: [id])
+  payments    Payment[]
+  documents   Document[]
+
+  @@index([memberId])
+  @@index([status])
+  @@index([dueDate])
+}
+
+model Payment {
+  id            String        @id @default(cuid())
+  invoiceId     String
+  amount        Decimal       @db.Decimal(12, 2)
+  paymentDate   DateTime      @default(now())
+  method        String?
+  reference     String?
+  notes         String?
+  createdById   String?
+  createdAt     DateTime      @default(now())
+
+  invoice   Invoice @relation(fields: [invoiceId], references: [id])
+  createdBy User?   @relation(fields: [createdById], references: [id])
+
+  @@index([invoiceId])
+}
+
+model ReminderHistory {
+  id            String        @id @default(cuid())
+  memberId      String
+  recipientEmail String
+  reminderDate  DateTime      @default(now())
+  reminderType  ReminderType
+  subject       String
+  deliveryStatus DeliveryStatus @default(PENDING)
+  responsibleId String?
+  notes         String?
+  createdAt     DateTime      @default(now())
+
+  member      Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  responsible User?  @relation(fields: [responsibleId], references: [id])
+
+  @@index([memberId])
+  @@index([reminderDate])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String?
+  memberId  String?
+  type      NotificationType
+  title     String
+  message   String
+  read      Boolean          @default(false)
+  dismissed Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  user   User?   @relation(fields: [userId], references: [id])
+  member Member? @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([memberId])
+  @@index([read])
+}
+
+model Document {
+  id           String   @id @default(cuid())
+  memberId     String?
+  invoiceId    String?
+  name         String
+  mimeType     String
+  size         Int
+  storagePath  String
+  uploadedById String?
+  createdAt    DateTime @default(now())
+
+  member        Member?           @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  invoice       Invoice?          @relation(fields: [invoiceId], references: [id])
+  uploadedBy    User?             @relation(fields: [uploadedById], references: [id])
+  onboardingTasks OnboardingTask[]
+
+  @@index([memberId])
+  @@index([invoiceId])
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  userId      String?
+  memberId    String?
+  action      String
+  entity      String
+  entityId    String?
+  previousValue Json?
+  newValue    Json?
+  createdAt   DateTime @default(now())
+
+  user   User?   @relation(fields: [userId], references: [id])
+  member Member? @relation(fields: [memberId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([memberId])
+  @@index([entity])
+  @@index([createdAt])
+}
+
+model SystemSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  description String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
