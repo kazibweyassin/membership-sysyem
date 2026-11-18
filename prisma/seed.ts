@@ -1,7 +1,16 @@
 import { PrismaClient, Role } from "@prisma/client";
 import * as bcrypt from "bcryptjs";
+import { randomBytes } from "crypto";
 
 const prisma = new PrismaClient();
+
+/**
+ * Idempotent. Safe to run on every deploy: categories and settings are
+ * upserted, and the administrator is only created when none exists.
+ *
+ * When SEED_ADMIN_PASSWORD is unset and an admin must be created, a random
+ * password is generated and printed once to the build log.
+ */
 
 async function main() {
   // Membership categories (spec 3.1). Fees are placeholders - edit them in
@@ -24,20 +33,35 @@ async function main() {
   console.log("Categories:", categories.map((c) => c.name).join(", "));
 
   // Bootstrap administrator
-  const email = process.env.SEED_ADMIN_EMAIL || "admin@fitspa.ug";
-  const password = process.env.SEED_ADMIN_PASSWORD || "ChangeMe123!";
-  const passwordHash = await bcrypt.hash(password, 10);
+  const email = (
+    process.env.SEED_ADMIN_EMAIL || "admin@fitspa.ug"
+  ).toLowerCase();
 
-  await prisma.user.upsert({
-    where: { email: email.toLowerCase() },
-    update: {},
-    create: {
-      email: email.toLowerCase(),
-      name: "System Administrator",
-      passwordHash,
-      role: Role.ADMINISTRATOR,
-    },
+  const existingAdmin = await prisma.user.findFirst({
+    where: { role: Role.ADMINISTRATOR },
+    select: { id: true },
   });
+
+  let generatedPassword: string | null = null;
+
+  if (!existingAdmin) {
+    generatedPassword =
+      process.env.SEED_ADMIN_PASSWORD ||
+      randomBytes(12).toString("base64url").slice(0, 16);
+
+    const passwordHash = await bcrypt.hash(generatedPassword, 10);
+
+    await prisma.user.upsert({
+      where: { email },
+      update: {},
+      create: {
+        email,
+        name: "System Administrator",
+        passwordHash,
+        role: Role.ADMINISTRATOR,
+      },
+    });
+  }
 
   // System settings (spec 7.1, 8.3)
   const settings = [
@@ -97,10 +121,18 @@ async function main() {
   }
 
   console.log("Settings seeded");
-  console.log(`\nAdministrator login:`);
-  console.log(`  Email:    ${email}`);
-  console.log(`  Password: ${password}`);
-  console.log(`\nChange this password immediately after first login.`);
+
+  if (generatedPassword) {
+    console.log(`\nAdministrator created:`);
+    console.log(`  Email:    ${email}`);
+    console.log(`  Password: ${generatedPassword}`);
+    console.log(
+      `\nStore this password, then change it after first login.\n` +
+        `It is only printed here, at creation time.`
+    );
+  } else {
+    console.log("Administrator already present, left unchanged");
+  }
 }
 
 main()

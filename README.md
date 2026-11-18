@@ -109,7 +109,11 @@ the `documents` volume; the database lives in the `pgdata` volume.
 3. **Expiry status refresh** — recomputes `expiryStatus` on every member from
    their latest membership period.
 
-Authenticate with `Authorization: Bearer <CRON_SECRET>`. Example crontab:
+Authenticate with `Authorization: Bearer <CRON_SECRET>`. `vercel.json` registers
+this as a daily job at 07:00 UTC; Vercel supplies that header automatically when
+`CRON_SECRET` is set in the project environment.
+
+Outside Vercel, use any scheduler:
 
 ```cron
 0 7 * * * curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://your-host/api/cron/run
@@ -120,6 +124,26 @@ Both steps are also callable individually:
 
 Without SMTP configured, reminders are still written to reminder history with
 `deliveryStatus = FAILED` and a reason, so they can be retried once mail is set up.
+
+## Deploying to Vercel
+
+1. Import the repository and set these environment variables:
+   `DATABASE_URL` (cloud Postgres, pooled connection string),
+   `JWT_SECRET` (long random string), `CRON_SECRET` (long random string).
+2. Deploy. The `build` script runs `prisma generate`, then
+   `prisma migrate deploy`, then `prisma db seed`, then `next build` — so a fresh
+   database is migrated and bootstrapped as part of the build, with nothing to
+   run by hand and no need to read the connection string yourself.
+3. On a first deploy the seed prints the generated administrator password to the
+   build log. It is printed once. Set `SEED_ADMIN_PASSWORD` instead if you would
+   rather choose it up front.
+4. Check `GET /api/health`. It returns `status: ok` with the public table count,
+   or names the misconfiguration (missing `DATABASE_URL`, a localhost host, or a
+   database with no tables).
+
+Document uploads write to `STORAGE_DIR`. Vercel's filesystem is read-only apart
+from `/tmp`, which does not persist, so point that variable at durable storage
+or uploads will fail there.
 
 ---
 
