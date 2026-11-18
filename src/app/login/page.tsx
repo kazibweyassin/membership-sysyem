@@ -45,7 +45,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="input"
-              placeholder="admin@membership.local"
+              placeholder="you@organisation.com"
               required
             />
           </div>
@@ -70,9 +70,6 @@ export default function LoginPage() {
             {loading ? "Signing in..." : "Sign In"}
           </button>
         </form>
-        <p className="text-center text-xs text-gray-400 mt-4">
-          Default: admin@membership.local / admin123
-        </p>
       </div>
     </div>
   );
