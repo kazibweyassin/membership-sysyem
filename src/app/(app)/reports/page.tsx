@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Download, FileSpreadsheet, FileText } from "lucide-react";
+import HelpLink from "@/components/help/HelpLink";
 
 interface ReportDef {
   id: string;
@@ -81,11 +82,18 @@ export default function ReportsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Reports</h1>
-        <p className="text-gray-500 mt-1">
-          All figures are derived live from the database. Export to Excel or PDF.
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Reports</h1>
+          <p className="text-gray-500 mt-1">
+            All figures are derived live from the database. Export to Excel or PDF.
+          </p>
+        </div>
+        <HelpLink
+          section="reports"
+          label="Help on reports"
+          className="w-8 h-8"
+        />
       </div>
 
       <div className="space-y-4">

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Save, Settings, Users, CreditCard, Bell } from "lucide-react";
+import HelpLink from "@/components/help/HelpLink";
 
 interface Setting {
   id: string;
@@ -121,9 +122,16 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="text-gray-500 mt-1">Manage system configuration</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
+          <p className="text-gray-500 mt-1">Manage system configuration</p>
+        </div>
+        <HelpLink
+          section="settings"
+          label="Help on settings and users"
+          className="w-8 h-8"
+        />
       </div>
 
       {/* Tabs */}

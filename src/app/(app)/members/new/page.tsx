@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Trash2 } from "lucide-react";
+import HelpLink from "@/components/help/HelpLink";
 
 interface Contact {
   fullName: string;
@@ -87,9 +88,16 @@ export default function RegisterMemberPage() {
 
   return (
     <div className="space-y-6 max-w-4xl">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Register Member</h1>
-        <p className="text-gray-500 mt-1">Add a new member to the system</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Register Member</h1>
+          <p className="text-gray-500 mt-1">Add a new member to the system</p>
+        </div>
+        <HelpLink
+          section="register"
+          label="Help on registering a member"
+          className="w-8 h-8"
+        />
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">

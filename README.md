@@ -47,7 +47,8 @@ npm run dev             # http://localhost:3000
 ```
 
 Login with the credentials printed by `db:seed`
-(default `admin@fitspa.ug` / `ChangeMe123!` — change it immediately).
+(the seed prints a random administrator password on first run — change it
+immediately, or set `SEED_ADMIN_PASSWORD` to choose one up front).
 
 ### npm scripts
 
@@ -217,6 +218,19 @@ Every figure is computed from database rows at request time.
 
 ---
 
+## In-app help
+
+The **Help & Guide** page (`/help`) walks users through the whole workflow:
+getting started, roles and access, registering a member, onboarding, invoices,
+payments, renewals, reminders, reports, documents, settings and users, the audit
+log, a status reference, and a troubleshooting FAQ.
+
+Every page header carries a **?** button (`HelpLink`) that deep-links to the
+relevant section, so help is always one click from where the user is. On small
+screens the guide exposes a contents menu for jumping between sections.
+
+---
+
 ## Layout
 
 ```
@@ -227,7 +241,7 @@ src/
   app/
     (app)/             authenticated pages (sidebar layout)
       dashboard/ members/ onboarding/ invoices/ payments/
-      renewals/ notifications/ reports/ audit-logs/ settings/
+      renewals/ notifications/ reports/ audit-logs/ settings/ help/
     api/               route handlers
       auth/ members/ onboarding/ categories/ invoices/ payments/
       reminders/ notifications/ renewals/ reports/ documents/
@@ -235,6 +249,7 @@ src/
     login/
   components/
     layout/            sidebar shell
+    help/              HelpLink "?" deep-link component
     providers/         JWT auth context
   lib/
     auth.ts            bcrypt + JWT

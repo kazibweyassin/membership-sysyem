@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Mail, Phone, Globe, MapPin, FileText, CreditCard, ClipboardCheck, Bell, RefreshCw, Send, Upload, Download } from "lucide-react";
+import HelpLink from "@/components/help/HelpLink";
 
 export default function MemberDetailPage() {
   const params = useParams();
@@ -145,6 +146,11 @@ export default function MemberDetailPage() {
         <span className={`badge ${statusColors[member.status] || "bg-gray-100 text-gray-700"}`}>
           {member.status}
         </span>
+        <HelpLink
+          section="register"
+          label="Help on member records"
+          className="w-8 h-8 mt-1"
+        />
       </div>
 
       {/* Summary Cards */}

@@ -18,6 +18,7 @@ import {
   Menu,
   X,
   ScrollText,
+  BookOpen,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -33,6 +34,7 @@ const navItems = [
   { href: "/reports", label: "Reports", icon: BarChart3, area: "reports" },
   { href: "/audit-logs", label: "Audit Log", icon: ScrollText, area: "reports" },
   { href: "/settings", label: "Settings", icon: Settings, area: "settings" },
+  { href: "/help", label: "Help & Guide", icon: BookOpen, area: null },
 ];
 
 // Mirrors the server-side permission matrix in src/lib/audit.ts. This only

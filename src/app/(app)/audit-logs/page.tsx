@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ClipboardList } from "lucide-react";
+import HelpLink from "@/components/help/HelpLink";
 
 export default function AuditLogPage() {
   const [logs, setLogs] = useState<any[]>([]);
@@ -26,9 +27,16 @@ export default function AuditLogPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Audit Log</h1>
-        <p className="text-gray-500 mt-1">System activity and change history</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Audit Log</h1>
+          <p className="text-gray-500 mt-1">System activity and change history</p>
+        </div>
+        <HelpLink
+          section="audit"
+          label="Help on the audit log"
+          className="w-8 h-8"
+        />
       </div>
 
       <div className="flex gap-3">

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Bell, Check, X } from "lucide-react";
+import HelpLink from "@/components/help/HelpLink";
 
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<any[]>([]);
@@ -64,9 +65,16 @@ export default function NotificationsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Notifications</h1>
-        <p className="text-gray-500 mt-1">View and manage system notifications</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Notifications</h1>
+          <p className="text-gray-500 mt-1">View and manage system notifications</p>
+        </div>
+        <HelpLink
+          section="reminders"
+          label="Help on notifications and reminders"
+          className="w-8 h-8"
+        />
       </div>
 
       {/* Tabs */}

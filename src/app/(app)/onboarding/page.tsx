@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ClipboardCheck, Clock, CheckCircle, AlertCircle } from "lucide-react";
+import HelpLink from "@/components/help/HelpLink";
 
 export default function OnboardingPage() {
   const [members, setMembers] = useState<any[]>([]);
@@ -64,9 +65,16 @@ export default function OnboardingPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Onboarding</h1>
-        <p className="text-gray-500 mt-1">Track new member onboarding progress</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Onboarding</h1>
+          <p className="text-gray-500 mt-1">Track new member onboarding progress</p>
+        </div>
+        <HelpLink
+          section="onboarding"
+          label="Help on onboarding"
+          className="w-8 h-8"
+        />
       </div>
 
       {/* Stats */}

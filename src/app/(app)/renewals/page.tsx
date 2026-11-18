@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { RefreshCw, AlertTriangle, Clock, CheckCircle } from "lucide-react";
+import HelpLink from "@/components/help/HelpLink";
 
 export default function RenewalsPage() {
   const [data, setData] = useState<any>(null);
@@ -39,9 +40,16 @@ export default function RenewalsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Renewals</h1>
-        <p className="text-gray-500 mt-1">Track membership expiry and renewals</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Renewals</h1>
+          <p className="text-gray-500 mt-1">Track membership expiry and renewals</p>
+        </div>
+        <HelpLink
+          section="renewals"
+          label="Help on renewals"
+          className="w-8 h-8"
+        />
       </div>
 
       {/* Summary Cards */}

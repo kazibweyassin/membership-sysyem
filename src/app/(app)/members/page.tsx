@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Search, Filter, UserPlus } from "lucide-react";
+import HelpLink from "@/components/help/HelpLink";
 
 interface Member {
   id: string;
@@ -83,10 +84,17 @@ export default function MembersPage() {
           <h1 className="text-2xl font-bold text-gray-900">Members</h1>
           <p className="text-gray-500 mt-1">Member directory</p>
         </div>
-        <Link href="/members/new" className="btn-primary">
-          <UserPlus className="w-4 h-4 mr-2" />
-          Register Member
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link href="/members/new" className="btn-primary">
+            <UserPlus className="w-4 h-4 mr-2" />
+            Register Member
+          </Link>
+          <HelpLink
+            section="register"
+            label="Help on registering a member"
+            className="w-8 h-8"
+          />
+        </div>
       </div>
 
       {/* Filters */}

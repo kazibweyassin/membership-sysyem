@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Plus, FileText, Search } from "lucide-react";
+import HelpLink from "@/components/help/HelpLink";
 
 export default function InvoicesPage() {
   const [invoices, setInvoices] = useState<any[]>([]);
@@ -109,10 +110,13 @@ export default function InvoicesPage() {
           <h1 className="text-2xl font-bold text-gray-900">Invoices</h1>
           <p className="text-gray-500 mt-1">Manage membership invoices</p>
         </div>
-        <button onClick={() => setShowModal(true)} className="btn-primary">
-          <Plus className="w-4 h-4 mr-2" />
-          Create Invoice
-        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={() => setShowModal(true)} className="btn-primary">
+            <Plus className="w-4 h-4 mr-2" />
+            Create Invoice
+          </button>
+          <HelpLink section="invoices" label="Help on invoices" className="w-8 h-8" />
+        </div>
       </div>
 
       {/* Filters */}
