@@ -32,10 +32,21 @@ async function main() {
 
   console.log("Categories:", categories.map((c) => c.name).join(", "));
 
-  // Bootstrap administrator
   const email = (
     process.env.SEED_ADMIN_EMAIL || "admin@fitspa.ug"
   ).toLowerCase();
+
+  // Bootstrap administrator.
+  //
+  // Three cases, in priority order:
+  //   1. SEED_ADMIN_PASSWORD is set  -> that password is applied to the
+  //      configured admin email, creating the user if absent. This is the
+  //      recovery path when a generated password has been lost.
+  //   2. No administrator exists     -> create one with a random password and
+  //      print it once.
+  //   3. An administrator exists     -> leave credentials untouched, so a
+  //      redeploy never silently resets someone's password.
+  const explicitPassword = process.env.SEED_ADMIN_PASSWORD?.trim() || null;
 
   const existingAdmin = await prisma.user.findFirst({
     where: { role: Role.ADMINISTRATOR },
@@ -43,11 +54,25 @@ async function main() {
   });
 
   let generatedPassword: string | null = null;
+  let appliedPassword = false;
 
-  if (!existingAdmin) {
-    generatedPassword =
-      process.env.SEED_ADMIN_PASSWORD ||
-      randomBytes(12).toString("base64url").slice(0, 16);
+  if (explicitPassword) {
+    const passwordHash = await bcrypt.hash(explicitPassword, 10);
+
+    await prisma.user.upsert({
+      where: { email },
+      update: { passwordHash },
+      create: {
+        email,
+        name: "System Administrator",
+        passwordHash,
+        role: Role.ADMINISTRATOR,
+      },
+    });
+
+    appliedPassword = true;
+  } else if (!existingAdmin) {
+    generatedPassword = randomBytes(12).toString("base64url").slice(0, 16);
 
     const passwordHash = await bcrypt.hash(generatedPassword, 10);
 
@@ -122,7 +147,10 @@ async function main() {
 
   console.log("Settings seeded");
 
-  if (generatedPassword) {
+  if (appliedPassword) {
+    console.log(`Administrator password set from SEED_ADMIN_PASSWORD`);
+    console.log(`  Email: ${email}`);
+  } else if (generatedPassword) {
     console.log(`\nAdministrator created:`);
     console.log(`  Email:    ${email}`);
     console.log(`  Password: ${generatedPassword}`);

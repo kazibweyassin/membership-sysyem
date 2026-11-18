@@ -134,9 +134,14 @@ Without SMTP configured, reminders are still written to reminder history with
    `prisma migrate deploy`, then `prisma db seed`, then `next build` — so a fresh
    database is migrated and bootstrapped as part of the build, with nothing to
    run by hand and no need to read the connection string yourself.
-3. On a first deploy the seed prints the generated administrator password to the
-   build log. It is printed once. Set `SEED_ADMIN_PASSWORD` instead if you would
-   rather choose it up front.
+3. On a first deploy the seed prints the generated administrator password to
+   the build log. It is printed once. Set `SEED_ADMIN_PASSWORD` instead if you
+   would rather choose it up front.
+
+   If you lose that password, set `SEED_ADMIN_PASSWORD` in Vercel and redeploy:
+   the seed then applies that password to the administrator account. Clear the
+   variable afterwards if you want the password to stay under your control
+   rather than the deploy pipeline's.
 4. Check `GET /api/health`. It returns `status: ok` with the public table count,
    or names the misconfiguration (missing `DATABASE_URL`, a localhost host, or a
    database with no tables).
