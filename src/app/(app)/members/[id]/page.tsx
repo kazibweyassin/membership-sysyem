@@ -16,6 +16,7 @@ export default function MemberDetailPage() {
 
   // Reminder modal
   const [showReminder, setShowReminder] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [reminderForm, setReminderForm] = useState({
     reminderType: "PAYMENT_DUE",
     recipientEmail: "",
@@ -151,6 +152,44 @@ export default function MemberDetailPage() {
           label="Help on member records"
           className="w-8 h-8 mt-1"
         />
+        {member.status !== "CANCELLED" && (
+          <button
+            onClick={() => {
+              if (
+                !window.confirm(
+                  `Cancel membership for "${member.companyName}"? This marks the member as Cancelled but preserves all history.`
+                )
+              ) {
+                return;
+              }
+              setDeleting(true);
+              fetch(`/api/members/${params.id}`, {
+                method: "DELETE",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token()}`,
+                },
+              })
+                .then(async (res) => {
+                  const data = await res.json();
+                  if (!res.ok) {
+                    alert(data.error || "Failed to cancel member");
+                    setDeleting(false);
+                    return;
+                  }
+                  alert("Member cancelled successfully");
+                  router.push("/members");
+                })
+                .catch((err) => {
+                  alert("Failed to cancel member: " + err.message);
+                  setDeleting(false);
+                });
+            }}
+            className="btn-danger text-sm px-3 py-1.5 mt-1"
+          >
+            {deleting ? "Cancelling..." : "Cancel Member"}
+          </button>
+        )}
       </div>
 
       {/* Summary Cards */}
