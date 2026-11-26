@@ -236,7 +236,11 @@ export default function MemberDetailPage() {
                     <select
                       value={member.status}
                       onChange={(e) => {
-                        const newStatus = e.target.value as "PAID" | "UNPAID" | "ONBOARDING" | "CANCELLED";
+                        const newStatus = e.target.value as
+                          | "PAID"
+                          | "UNPAID"
+                          | "ONBOARDING"
+                          | "CANCELLED";
                         fetch(`/api/members/${params.id}`, {
                           method: "PUT",
                           headers: {
@@ -245,10 +249,17 @@ export default function MemberDetailPage() {
                           },
                           body: JSON.stringify({ status: newStatus }),
                         })
-                          .then((res) => res.json())
-                          .then((data) => {
-                            if (data.error) alert(data.error);
-                            else setMember(data.member);
+                          .then(async (res) => {
+                            const data = await res.json();
+                            if (!res.ok) {
+                              alert(data.error || "Failed to update status");
+                              return;
+                            }
+                            setMember(data.member);
+                            alert("Membership status updated successfully");
+                          })
+                          .catch((err) => {
+                            alert("Failed to update status: " + err.message);
                           });
                       }}
                       className="input"
