@@ -255,7 +255,7 @@ export default function MemberDetailPage() {
                               alert(data.error || "Failed to update status");
                               return;
                             }
-                            setMember(data.member);
+                            setMember({ ...member, status: newStatus });
                             alert("Membership status updated successfully");
                           })
                           .catch((err) => {
