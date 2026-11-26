@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Plus, CreditCard } from "lucide-react";
 import HelpLink from "@/components/help/HelpLink";
+import { formatMoney } from "@/lib/currency";
 
 export default function PaymentsPage() {
   const [invoices, setInvoices] = useState<any[]>([]);
@@ -108,27 +109,27 @@ export default function PaymentsPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="card">
           <p className="text-sm text-gray-500">Total Collected</p>
-          <p className="text-2xl font-bold text-green-600 mt-1">
-            ${invoices.reduce((sum, inv) => sum + inv.amountPaid, 0).toLocaleString()}
-          </p>
+            <p className="text-2xl font-bold text-green-600 mt-1">
+              {formatMoney(invoices.reduce((sum, inv) => sum + inv.amountPaid, 0))}
+            </p>
         </div>
         <div className="card">
           <p className="text-sm text-gray-500">Outstanding</p>
-          <p className="text-2xl font-bold text-yellow-600 mt-1">
-            ${invoices.reduce((sum, inv) => sum + inv.outstanding, 0).toLocaleString()}
-          </p>
+            <p className="text-2xl font-bold text-yellow-600 mt-1">
+              {formatMoney(invoices.reduce((sum, inv) => sum + inv.outstanding, 0))}
+            </p>
         </div>
         <div className="card">
           <p className="text-sm text-gray-500">Overdue</p>
-          <p className="text-2xl font-bold text-red-600 mt-1">
-            ${unpaidInvoices.filter((inv) => new Date(inv.dueDate) < new Date()).reduce((sum, inv) => sum + inv.outstanding, 0).toLocaleString()}
-          </p>
+            <p className="text-2xl font-bold text-red-600 mt-1">
+              {formatMoney(unpaidInvoices.filter((inv) => new Date(inv.dueDate) < new Date()).reduce((sum, inv) => sum + inv.outstanding, 0))}
+            </p>
         </div>
         <div className="card">
           <p className="text-sm text-gray-500">Total Invoiced</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">
-            ${invoices.reduce((sum, inv) => sum + inv.amount, 0).toLocaleString()}
-          </p>
+            <p className="text-2xl font-bold text-gray-900 mt-1">
+              {formatMoney(invoices.reduce((sum, inv) => sum + inv.amount, 0))}
+            </p>
         </div>
       </div>
 
@@ -165,9 +166,9 @@ export default function PaymentsPage() {
                         {inv.member.companyName}
                       </Link>
                     </td>
-                    <td>${inv.amount.toLocaleString()}</td>
-                    <td>${inv.amountPaid.toLocaleString()}</td>
-                    <td className="font-semibold text-red-600">${inv.outstanding.toLocaleString()}</td>
+                    <td>{formatMoney(inv.amount)}</td>
+                    <td>{formatMoney(inv.amountPaid)}</td>
+                    <td className="font-semibold text-red-600">{formatMoney(inv.outstanding)}</td>
                     <td>{new Date(inv.dueDate).toLocaleDateString()}</td>
                     <td>
                       <span className={`badge ${statusColors[inv.status] || "bg-gray-100 text-gray-700"}`}>
@@ -215,7 +216,7 @@ export default function PaymentsPage() {
                     <td>{new Date(p.paymentDate).toLocaleDateString()}</td>
                     <td className="font-mono text-xs">{p.invoice.invoiceNumber}</td>
                     <td>{p.invoice.member.companyName}</td>
-                    <td className="font-semibold text-green-600">${p.amount.toLocaleString()}</td>
+                    <td className="font-semibold text-green-600">{formatMoney(p.amount)}</td>
                     <td>{p.method || "N/A"}</td>
                     <td>{p.reference || "N/A"}</td>
                   </tr>
@@ -243,11 +244,11 @@ export default function PaymentsPage() {
               <div className="bg-gray-50 rounded-lg p-3 text-sm">
                 <div className="flex justify-between">
                   <span>Invoice Amount:</span>
-                  <span className="font-semibold">${selectedInvoice.amount.toLocaleString()}</span>
+                  <span className="font-semibold">{formatMoney(selectedInvoice.amount)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Outstanding:</span>
-                  <span className="font-semibold text-red-600">${selectedInvoice.outstanding.toLocaleString()}</span>
+                  <span className="font-semibold text-red-600">{formatMoney(selectedInvoice.outstanding)}</span>
                 </div>
               </div>
               <div>

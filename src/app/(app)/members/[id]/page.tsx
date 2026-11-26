@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Mail, Phone, Globe, MapPin, FileText, CreditCard, ClipboardCheck, Bell, RefreshCw, Send, Upload, Download } from "lucide-react";
 import HelpLink from "@/components/help/HelpLink";
+import { formatMoney } from "@/lib/currency";
 
 export default function MemberDetailPage() {
   const params = useParams();
@@ -416,7 +417,7 @@ export default function MemberDetailPage() {
                         <td className="font-mono text-xs">{inv.invoiceNumber}</td>
                         <td>{new Date(inv.invoiceDate).toLocaleDateString()}</td>
                         <td>{new Date(inv.dueDate).toLocaleDateString()}</td>
-                        <td>${inv.amount.toLocaleString()}</td>
+                        <td>{formatMoney(inv.amount)}</td>
                         <td>
                           <span className={`badge ${
                             inv.status === "PAID" ? "bg-green-100 text-green-700" :
@@ -457,7 +458,7 @@ export default function MemberDetailPage() {
                         <tr key={p.id}>
                           <td>{new Date(p.paymentDate).toLocaleDateString()}</td>
                           <td className="font-mono text-xs">{inv.invoiceNumber}</td>
-                          <td>${p.amount.toLocaleString()}</td>
+                          <td>{formatMoney(p.amount)}</td>
                           <td>{p.method || "N/A"}</td>
                           <td>{p.reference || "N/A"}</td>
                         </tr>

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Save, Settings, Users, CreditCard, Bell } from "lucide-react";
 import HelpLink from "@/components/help/HelpLink";
+import { formatMoney } from "@/lib/currency";
 
 interface Setting {
   id: string;
@@ -266,7 +267,7 @@ export default function SettingsPage() {
                       </div>
                     ) : (
                       <>
-                        <span className="font-semibold">${Number(cat.fee).toLocaleString()}</span>
+                        <span className="font-semibold">{formatMoney(Number(cat.fee))}</span>
                         <button
                           onClick={() => {
                             setEditing(cat.id);

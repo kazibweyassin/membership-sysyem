@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Trash2 } from "lucide-react";
 import HelpLink from "@/components/help/HelpLink";
+import { formatMoney } from "@/lib/currency";
 
 interface Contact {
   fullName: string;
@@ -150,7 +151,7 @@ export default function RegisterMemberPage() {
                 <option value="">Select category</option>
                 {categories.map((c) => (
                   <option key={c.id} value={c.id}>
-                    {c.name} (${c.fee})
+                    {c.name} ({formatMoney(Number(c.fee))})
                   </option>
                 ))}
               </select>

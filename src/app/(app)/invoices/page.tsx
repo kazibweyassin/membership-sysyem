@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Plus, FileText, Search } from "lucide-react";
 import HelpLink from "@/components/help/HelpLink";
+import { formatMoney } from "@/lib/currency";
 
 export default function InvoicesPage() {
   const [invoices, setInvoices] = useState<any[]>([]);
@@ -19,7 +20,7 @@ export default function InvoicesPage() {
     categoryId: "",
     dueDate: "",
     amount: "",
-    currency: "USD",
+    currency: "UGX",
     notes: "",
   });
   const [error, setError] = useState("");
@@ -85,7 +86,7 @@ export default function InvoicesPage() {
       return;
     }
     setShowModal(false);
-    setForm({ memberId: "", categoryId: "", dueDate: "", amount: "", currency: "USD", notes: "" });
+    setForm({ memberId: "", categoryId: "", dueDate: "", amount: "", currency: "UGX", notes: "" });
     fetchInvoices();
   }
 
@@ -176,8 +177,8 @@ export default function InvoicesPage() {
                         {inv.member.companyName}
                       </Link>
                     </td>
-                    <td>${inv.amount.toLocaleString()}</td>
-                    <td>${inv.outstanding.toLocaleString()}</td>
+                    <td>{formatMoney(inv.amount)}</td>
+                    <td>{formatMoney(inv.outstanding)}</td>
                     <td>{new Date(inv.dueDate).toLocaleDateString()}</td>
                     <td>
                       <span className={`badge ${statusColors[inv.status] || "bg-gray-100 text-gray-700"}`}>

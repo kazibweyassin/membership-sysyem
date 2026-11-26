@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { formatMoney } from "@/lib/currency";
 import {
   Users,
   CheckCircle,
@@ -110,23 +111,23 @@ export default function DashboardPage() {
           <div className="space-y-3">
             <div className="flex justify-items-between justify-between">
               <span className="text-gray-600">Received This Month</span>
-              <span className="font-semibold text-green-600">${data.payments.receivedThisMonth.toLocaleString()}</span>
+              <span className="font-semibold text-green-600">{formatMoney(data.payments.receivedThisMonth)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Outstanding</span>
-              <span className="font-semibold text-yellow-600">${data.payments.outstanding.toLocaleString()}</span>
+              <span className="font-semibold text-yellow-600">{formatMoney(data.payments.outstanding)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Overdue</span>
-              <span className="font-semibold text-red-600">${data.payments.overdue.toLocaleString()}</span>
+              <span className="font-semibold text-red-600">{formatMoney(data.payments.overdue)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Total Invoiced</span>
-              <span className="font-semibold text-gray-900">${data.payments.totalInvoiced.toLocaleString()}</span>
+              <span className="font-semibold text-gray-900">{formatMoney(data.payments.totalInvoiced)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Total Collected</span>
-              <span className="font-semibold text-gray-900">${data.payments.totalCollected.toLocaleString()}</span>
+              <span className="font-semibold text-gray-900">{formatMoney(data.payments.totalCollected)}</span>
             </div>
           </div>
         </div>
