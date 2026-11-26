@@ -21,6 +21,7 @@ async function main() {
       { name: "Silver", fee: 0, description: "Standard membership" },
       { name: "Gold", fee: 0, description: "Premium membership" },
       { name: "Platinum", fee: 0, description: "Top tier membership" },
+      { name: "Associate Member", fee: 0, description: "Associate membership category" },
     ].map((c) =>
       prisma.membershipCategory.upsert({
         where: { name: c.name },

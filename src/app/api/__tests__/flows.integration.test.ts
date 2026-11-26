@@ -87,12 +87,15 @@ beforeEach(async () => {
   await prisma.member.deleteMany();
 });
 
-async function registerMember(companyName: string) {
+let memberNumberSeq = 0;
+
+async function registerMember(companyName: string, memberNumber?: string) {
   const res = await createMember(
     authReq("http://localhost/api/members", {
       method: "POST",
       body: JSON.stringify({
         companyName,
+        memberNumber: memberNumber ?? `MBR-TEST-${String(memberNumberSeq++).padStart(4, "0")}`,
         categoryId: goldCategoryId,
         startDate: "2026-01-15",
         address: "Kampala",
@@ -123,15 +126,23 @@ async function issueInvoice(memberId: string, amount: number, dueDate: string) {
 }
 
 describe("member registration", () => {
-  it("registers a member with three contacts and a generated member number", async () => {
-    const { res, body } = await registerMember("Fintech Alpha Ltd");
+  it("registers a member with three contacts and a manual member number", async () => {
+    const { res, body } = await registerMember("Fintech Alpha Ltd", "MBR-2026-0001");
 
     expect(res.status).toBe(201);
     expect(body.member.companyName).toBe("Fintech Alpha Ltd");
-    expect(body.member.memberNumber).toMatch(/^MBR-\d{4}-\d{4}$/);
+    expect(body.member.memberNumber).toBe("MBR-2026-0001");
     expect(body.member.internalId).toMatch(/^INT-\d{6}$/);
     expect(body.member.contacts).toHaveLength(3);
     expect(body.member.contacts.filter((c: any) => c.isPrimary)).toHaveLength(1);
+  });
+
+  it("rejects registration with a duplicate member number", async () => {
+    await registerMember("Dup A Ltd", "MBR-2026-DUP");
+    const { res } = await registerMember("Dup B Ltd", "MBR-2026-DUP");
+
+    expect(res.status).toBe(400);
+    expect((await res.json()).error).toMatch(/member number/i);
   });
 
   it("creates six onboarding tasks with only registration complete", async () => {
@@ -144,10 +155,12 @@ describe("member registration", () => {
     expect(tasks.find((t: any) => t.stage === 2).status).toBe("PENDING");
   });
 
-  it("generates unique member numbers across registrations", async () => {
-    const a = await registerMember("Unique A Ltd");
-    const b = await registerMember("Unique B Ltd");
+  it("requires unique manual member numbers across registrations", async () => {
+    const a = await registerMember("Unique A Ltd", "MBR-2026-UNQA");
+    const b = await registerMember("Unique B Ltd", "MBR-2026-UNQB");
 
+    expect(a.body.member.memberNumber).toBe("MBR-2026-UNQA");
+    expect(b.body.member.memberNumber).toBe("MBR-2026-UNQB");
     expect(a.body.member.memberNumber).not.toBe(b.body.member.memberNumber);
   });
 

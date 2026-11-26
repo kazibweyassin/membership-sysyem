@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export const registerSchema = z.object({
   companyName: z.string().min(2, "Company name is required"),
+  memberNumber: z.string().min(1, "Member number is required"),
   categoryId: z.string().min(1, "Category is required"),
   startDate: z.string().min(1, "Start date is required"),
   address: z.string().optional(),
@@ -12,8 +13,8 @@ export const registerSchema = z.object({
       z.object({
         fullName: z.string().min(2, "Full name is required"),
         jobTitle: z.string().optional(),
-        phone: z.string().min(1, "Phone is required"),
-        email: z.string().email("Valid email is required"),
+        phone: z.string().optional().or(z.literal("")),
+        email: z.string().email("Valid email is required").optional().or(z.literal("")),
         isPrimary: z.boolean().optional(),
       })
     )
@@ -35,8 +36,8 @@ export const updateMemberSchema = z.object({
 export const contactSchema = z.object({
   fullName: z.string().min(2, "Full name is required"),
   jobTitle: z.string().optional(),
-  phone: z.string().min(1, "Phone is required"),
-  email: z.string().email("Valid email is required"),
+  phone: z.string().optional().or(z.literal("")),
+  email: z.string().email("Valid email is required").optional().or(z.literal("")),
   isPrimary: z.boolean().optional(),
 });
 

@@ -21,6 +21,7 @@ export default function RegisterMemberPage() {
 
   const [form, setForm] = useState({
     companyName: "",
+    memberNumber: "",
     categoryId: "",
     startDate: new Date().toISOString().split("T")[0],
     address: "",
@@ -125,6 +126,19 @@ export default function RegisterMemberPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
+                Member Number *
+              </label>
+              <input
+                type="text"
+                value={form.memberNumber}
+                onChange={(e) => setForm({ ...form, memberNumber: e.target.value })}
+                className="input"
+                required
+                placeholder="e.g. MBR-2026-0001"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Membership Category *
               </label>
               <select
@@ -178,7 +192,7 @@ export default function RegisterMemberPage() {
             </div>
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Notes
+                Company Category
               </label>
               <textarea
                 value={form.notes}
@@ -246,21 +260,19 @@ export default function RegisterMemberPage() {
                   <div>
                     <input
                       type="tel"
-                      placeholder="Phone *"
+                      placeholder="Phone"
                       value={contact.phone}
                       onChange={(e) => updateContact(i, "phone", e.target.value)}
                       className="input"
-                      required
                     />
                   </div>
                   <div>
                     <input
                       type="email"
-                      placeholder="Email *"
+                      placeholder="Email"
                       value={contact.email}
                       onChange={(e) => updateContact(i, "email", e.target.value)}
                       className="input"
-                      required
                     />
                   </div>
                   <div className="flex items-center">

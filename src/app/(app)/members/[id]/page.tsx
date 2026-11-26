@@ -208,26 +208,59 @@ export default function MemberDetailPage() {
             <div>
               <h3 className="font-semibold mb-2">Company Details</h3>
               <div className="grid md:grid-cols-2 gap-4 text-sm">
+              <div className="flex items-start gap-2">
+                <MapPin className="w-4 h-4 text-gray-400 mt-0.5" />
+                <div>
+                  <p className="text-gray-500">Address</p>
+                  <p>{member.address || "Not provided"}</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <Globe className="w-4 h-4 text-gray-400 mt-0.5" />
+                <div>
+                  <p className="text-gray-500">Website</p>
+                  {member.website ? (
+                    <a href={member.website} target="_blank" rel="noopener noreferrer" className="text-brand-600 hover:underline">
+                      {member.website}
+                    </a>
+                  ) : (
+                    <p>Not provided</p>
+                  )}
+                </div>
+              </div>
+              <div className="md:col-span-2">
                 <div className="flex items-start gap-2">
-                  <MapPin className="w-4 h-4 text-gray-400 mt-0.5" />
+                  <CreditCard className="w-4 h-4 text-gray-400 mt-0.5" />
                   <div>
-                    <p className="text-gray-500">Address</p>
-                    <p>{member.address || "Not provided"}</p>
+                    <p className="text-gray-500">Membership Status</p>
+                    <select
+                      value={member.status}
+                      onChange={(e) => {
+                        const newStatus = e.target.value as "PAID" | "UNPAID" | "ONBOARDING" | "CANCELLED";
+                        fetch(`/api/members/${params.id}`, {
+                          method: "PUT",
+                          headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${token()}`,
+                          },
+                          body: JSON.stringify({ status: newStatus }),
+                        })
+                          .then((res) => res.json())
+                          .then((data) => {
+                            if (data.error) alert(data.error);
+                            else setMember(data.member);
+                          });
+                      }}
+                      className="input"
+                    >
+                      <option value="PAID">Paid</option>
+                      <option value="UNPAID">Unpaid</option>
+                      <option value="ONBOARDING">Onboarding</option>
+                      <option value="CANCELLED">Cancelled</option>
+                    </select>
                   </div>
                 </div>
-                <div className="flex items-start gap-2">
-                  <Globe className="w-4 h-4 text-gray-400 mt-0.5" />
-                  <div>
-                    <p className="text-gray-500">Website</p>
-                    {member.website ? (
-                      <a href={member.website} target="_blank" rel="noopener noreferrer" className="text-brand-600 hover:underline">
-                        {member.website}
-                      </a>
-                    ) : (
-                      <p>Not provided</p>
-                    )}
-                  </div>
-                </div>
+              </div>
               </div>
             </div>
             <div>

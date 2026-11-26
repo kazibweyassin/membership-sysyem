@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requirePermission, requireAuth, apiError, ApiError } from "@/lib/middleware";
-import { generateMemberNumber, generateInternalId } from "@/lib/id-generator";
+import { generateInternalId } from "@/lib/id-generator";
 import { recordAudit } from "@/lib/audit";
 import { ONBOARDING_STAGES } from "@/lib/onboarding";
 import { registerSchema } from "@/lib/validation";
@@ -72,14 +72,20 @@ export async function POST(req: NextRequest) {
     });
     if (!category) throw new ApiError(400, "Unknown membership category");
 
-    const memberNumber = await generateMemberNumber();
+    // Member numbers are entered manually (existing members keep their numbers)
+    const existingNumber = await prisma.member.findUnique({
+      where: { memberNumber: body.memberNumber },
+      select: { id: true },
+    });
+    if (existingNumber) throw new ApiError(400, "Member number already in use");
+
     const internalId = await generateInternalId();
 
     // Create member with contacts and default onboarding tasks
     const member = await prisma.member.create({
       data: {
         internalId,
-        memberNumber,
+        memberNumber: body.memberNumber,
         companyName: body.companyName,
         categoryId: body.categoryId,
         startDate: new Date(body.startDate),
