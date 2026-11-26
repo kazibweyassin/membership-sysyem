@@ -54,7 +54,7 @@ export async function GET(req: NextRequest) {
       const result = await dispatch({
         memberId: inv.memberId,
         memberCompany: inv.member.companyName,
-        contacts: inv.member.contacts.map((c) => c.email),
+        contacts: inv.member.contacts.map((c) => c.email).filter((e): e is string => !!e),
         reminderType: "PAYMENT_DUE",
         build: () =>
           REMINDER_TEMPLATES.PAYMENT_DUE(
@@ -90,7 +90,7 @@ export async function GET(req: NextRequest) {
       const result = await dispatch({
         memberId: inv.memberId,
         memberCompany: inv.member.companyName,
-        contacts: inv.member.contacts.map((c) => c.email),
+        contacts: inv.member.contacts.map((c) => c.email).filter((e): e is string => !!e),
         reminderType: "PAYMENT_OVERDUE",
         build: () =>
           REMINDER_TEMPLATES.PAYMENT_OVERDUE(
@@ -133,7 +133,7 @@ export async function GET(req: NextRequest) {
         const result = await dispatch({
           memberId: period.memberId,
           memberCompany: period.member.companyName,
-          contacts: period.member.contacts.map((c) => c.email),
+          contacts: period.member.contacts.map((c) => c.email).filter((e): e is string => !!e),
           reminderType: days === 0 ? "RENEWAL" : "MEMBERSHIP_EXPIRY",
           build: () =>
             days === 0
